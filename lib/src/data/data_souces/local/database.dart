@@ -20,7 +20,7 @@ part 'database.g.dart';
     TasksDao,
   ],
 )
-abstract class AppDatabase extends _$AppDatabase {
+class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override

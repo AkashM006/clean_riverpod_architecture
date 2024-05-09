@@ -41,6 +41,7 @@ class TasksDao extends DatabaseAccessor<AppDatabase> with _$TasksDaoMixin {
   }
 
   Future<void> updateTask(TaskModel newTask) async {
+    print("New Task: ${newTask}");
     try {
       final result = await (update(tasks)
             ..where((tbl) => tbl.id.equals(newTask.id)))
@@ -56,6 +57,7 @@ class TasksDao extends DatabaseAccessor<AppDatabase> with _$TasksDaoMixin {
         );
       }
     } catch (e) {
+      print("Error: ${e.toString()}");
       if (e is AppError) rethrow;
       throw const AppError(
         message: "Unable to update the task. Please try again later",

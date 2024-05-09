@@ -2,7 +2,11 @@ import 'package:clean_riverpod_architecture/src/data/data_souces/local/database.
 import 'package:clean_riverpod_architecture/src/data/repositories/base/base_db_repository.dart';
 import 'package:clean_riverpod_architecture/src/domain/models/task.model.dart';
 import 'package:clean_riverpod_architecture/src/domain/repositories/tasks_repository.dart';
+import 'package:clean_riverpod_architecture/src/locator.dart';
 import 'package:clean_riverpod_architecture/src/utils/classes/data_state.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'task_repository_impl.g.dart';
 
 class TasksRepositoryImplementation extends BaseDbRepository
     implements TasksRepository {
@@ -27,12 +31,17 @@ class TasksRepositoryImplementation extends BaseDbRepository
 
   @override
   Future<TaskModel> getTask(int id) async {
-    final result = await _appDatabase.tasksDao.getTask(id);
+    try {
+      final result = await _appDatabase.tasksDao.getTask(id);
 
-    return TaskModel(
-      title: result.title,
-      description: result.description,
-    );
+      return TaskModel(
+        id: result.id,
+        title: result.title,
+        description: result.description,
+      );
+    } catch (e) {
+      rethrow;
+    }
   }
 
   @override
@@ -49,4 +58,16 @@ class TasksRepositoryImplementation extends BaseDbRepository
   Future<DataState<void>> updateTask(TaskModel newTask) {
     return safeExecute(() => _appDatabase.tasksDao.updateTask(newTask));
   }
+}
+
+@riverpod
+Stream<List<TaskModel>> tasks(TasksRef ref) {
+  final tasksRepository = locator<TasksRepository>();
+  return tasksRepository.watchTasks();
+}
+
+@riverpod
+Future<TaskModel> singleTask(SingleTaskRef ref, int id) {
+  final tasksRepository = locator<TasksRepository>();
+  return tasksRepository.getTask(id);
 }
